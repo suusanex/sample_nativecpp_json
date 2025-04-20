@@ -12,6 +12,27 @@
 
 using namespace boost::property_tree;
 
+std::wstring ConvertUtf8ToUtf16(LPCSTR utf8Str) {
+
+    int sizeNeeded = MultiByteToWideChar(CP_UTF8, 0, utf8Str, -1, nullptr, 0);
+    if (sizeNeeded == 0)
+    {
+        const auto win32Err = GetLastError();
+        std::cerr << "WideCharToMultiByte failed, Win32Err=" << win32Err << ", InputStr=" << utf8Str << std::endl;
+        throw std::exception("WideCharToMultiByte failed");
+    }
+
+    std::wstring utf16Str(sizeNeeded - 1, 0);
+    if (MultiByteToWideChar(CP_UTF8, 0, utf8Str, -1, &utf16Str[0], sizeNeeded) == 0)
+    {
+        const auto win32Err = GetLastError();
+        std::cerr << "WideCharToMultiByte failed, Win32Err=" << win32Err << ", InputStr=" << utf8Str << std::endl;
+        throw std::exception("WideCharToMultiByte failed");
+    }
+
+    return utf16Str;
+}
+
 std::string ConvertUtf16ToUtf8(LPCWSTR utf16Str) {
 
     int sizeNeeded = WideCharToMultiByte(
