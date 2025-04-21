@@ -72,15 +72,13 @@ int main()
 
         LPCWSTR filePath = L"サンプル.json";
 
-        //UTF-8のjsonを読み込むためのロケール設定をする
-        std::locale utf8_locale(std::locale(), new std::codecvt_utf8<wchar_t>());
-        wptree pt;
-        read_json(ConvertUtf16ToUtf8(filePath), pt, utf8_locale);
+        ptree pt;
+        read_json(ConvertUtf16ToUtf8(filePath), pt);
 
         //以下、各値の読み込みのテスト
 
         // Data.value
-        if (boost::optional<int> value = pt.get_optional<int>(L"Data.value")) {
+        if (boost::optional<int> value = pt.get_optional<int>("Data.value")) {
             std::wcout << L"value : " << value.get() << std::endl;
         }
         else {
@@ -88,19 +86,19 @@ int main()
         }
 
         // Data.str
-        if (boost::optional<std::wstring> str = pt.get_optional<std::wstring>(L"Data.str")) {
-            std::wcout << L"str : " << str.get() << std::endl;
+        if (boost::optional<std::string> str = pt.get_optional<std::string>("Data.str")) {
+            std::wcout << L"str : " << ConvertUtf8ToUtf16(str.get().c_str()) << std::endl;
         }
         else {
             std::wcout << L"str is nothing" << std::endl;
         }
 
         // Data.info
-        BOOST_FOREACH(const wptree::value_type & child, pt.get_child(L"Data.info")) {
-            const wptree& info = child.second;
+        BOOST_FOREACH(const ptree::value_type & child, pt.get_child("Data.info")) {
+            const ptree& info = child.second;
 
             // Data.info.id
-            if (boost::optional<int> id = info.get_optional<int>(L"id")) {
+            if (boost::optional<int> id = info.get_optional<int>("id")) {
                 std::wcout << L"id : " << id.get() << std::endl;
             }
             else {
@@ -108,8 +106,8 @@ int main()
             }
 
             // Data.info.name
-            if (boost::optional<std::wstring> name = info.get_optional<std::wstring>(L"name")) {
-                std::wcout << L"name : " << name.get() << std::endl;
+            if (boost::optional<std::string> name = info.get_optional<std::string>("name")) {
+                std::wcout << L"name : " << ConvertUtf8ToUtf16(name.get().c_str()) << std::endl;
             }
             else {
                 std::wcout << L"name is nothing" << std::endl;
